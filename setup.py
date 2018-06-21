@@ -14,8 +14,13 @@ setuptools.setup(
     url="https://github.com/Olegt0rr/aioChatbase",
     packages=setuptools.find_packages(),
     classifiers=(
-        "Programming Language :: Python :: 3",
+        "Development Status :: 3 - Alpha",
+        "Environment :: Console",
+        "Framework :: AsyncIO",
         "License :: OSI Approved :: MIT License",
+        "Natural Language :: English",
         "Operating System :: OS Independent",
+        "Intended Audience :: Developers",
+        "Programming Language :: Python :: 3.6",
     ),
 )
