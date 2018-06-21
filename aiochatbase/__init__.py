@@ -1,1 +1,2 @@
-from aiochatbase.chatbase import Chatbase
+from .chatbase import Chatbase
+__version__ = '0.0.1'
