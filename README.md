@@ -5,6 +5,11 @@
 **aioChatbase** is a library for [Chatbase Generic Message API](https://chatbase.com/documentation/generic) written in Python 3.6 with [asyncio](https://docs.python.org/3/library/asyncio.html) and [aiohttp](https://github.com/aio-libs/aiohttp). 
 It helps to integrate Chatbase with your chatbot.
 
+## How to install
+```
+python3.6 -m pip install aioChatbase
+```
+
 ## How to use
 1) Import Chatbase
 ```python
