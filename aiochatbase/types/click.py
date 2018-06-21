@@ -1,14 +1,12 @@
 import json
 import logging
 
-import aiohttp
-
-from ..types.errors import ReceivedNoMessage, ChatbaseException, InvalidApiKey
+from .basic import BasicChatbaseObject
 
 logger = logging.getLogger(f'chatbase.{__name__}')
 
 
-class Click:
+class Click(BasicChatbaseObject):
     def __init__(self, api_key, url, platform, user_id=None, version=None):
         """
 
@@ -39,7 +37,6 @@ class Click:
         self.user_id = user_id
         self.version = version
 
-        self._content_type = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         self._api_url = f"https://chatbase.com/api/click"
 
     def to_json(self):
@@ -55,23 +52,6 @@ class Click:
         return json.dumps(data)
 
     async def send(self):
-        """ Send the message set to the Chatbase API """
-
-        async with aiohttp.ClientSession() as session:
-            async with session.post(self._api_url, data=self.to_json(), headers=self._content_type) as resp:
-                if resp.status == 200:
-                    response_json = await resp.text()
-                    logger.debug(f'Resp status: {resp.status}, resp text: {response_json}')
-                    return True
-
-                if resp.status == 400:
-                    response_json = await resp.text()
-                    response_dict = json.loads(response_json)
-                    error_text = response_dict.get('reason')
-
-                    if error_text == "Error fetching parameter 'api_key': Missing or invalid field(s): 'api_key'":
-                        raise InvalidApiKey()
-
-                    raise ChatbaseException(error_text)
-
-                raise ChatbaseException('Unknown response')
+        result = await self._send()
+        if result.get('status') == 200:
+            return True

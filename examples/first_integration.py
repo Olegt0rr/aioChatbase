@@ -3,6 +3,7 @@ import asyncio
 from aiochatbase import Chatbase
 
 API_KEY = 'paste-your-api-key-token-here'
+API_KEY = '94735589-03f9-450c-9666-66cd2efdf21e'
 PLATFORM = 'Telegram'
 
 loop = asyncio.get_event_loop()

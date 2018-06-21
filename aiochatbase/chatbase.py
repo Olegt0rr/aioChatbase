@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from .types import Message, MessageTypes, Click
+from .types import Message, MessageTypes, Click, Event
 
 
 class Chatbase:
@@ -53,3 +53,14 @@ class Chatbase:
         """
         click = Click(self.api_key, url, self.platform, user_id=user_id, version=version)
         return await click.send()
+
+    async def register_event(self, user_id, intent, timestamp=datetime.now().timestamp(), platform=None, version=None,
+                             properties=None):
+        event = Event(api_key=self.api_key,
+                      user_id=user_id,
+                      intent=intent,
+                      timestamp_millis=int(timestamp * 1000),
+                      platform=platform,
+                      version=version,
+                      properties=properties)
+        return await event.send()

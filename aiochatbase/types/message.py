@@ -1,13 +1,12 @@
-import logging
 import json
+import logging
 
-import aiohttp
-from ..types.errors import ReceivedNoMessage, ChatbaseException, InvalidApiKey
+from .basic import BasicChatbaseObject
 
 logger = logging.getLogger(f'chatbase.{__name__}')
 
 
-class Message:
+class Message(BasicChatbaseObject):
     def __init__(self, api_key, message_type, user_id, time_stamp, platform, message=None, intent=None,
                  not_handled=None, version=None, session_id=None):
         """
@@ -68,7 +67,6 @@ class Message:
         self.version = version
         self.session_id = session_id
 
-        self._content_type = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         self._api_url = f"https://chatbase.com/api/message"
 
     def to_json(self):
@@ -98,30 +96,6 @@ class Message:
         return True
 
     async def send(self):
-        """
-        Send the message set to the Chatbase API
-
-        :return: Chatbase message id
-        :rtype: str
-        """
         await self.check()
-
-        async with aiohttp.ClientSession() as session:
-            async with session.post(self._api_url, data=self.to_json(), headers=self._content_type) as resp:
-                if resp.status == 200:
-                    response_json = await resp.text()
-                    response_dict = json.loads(response_json)
-                    logger.debug(f'Resp status: {resp.status}, resp text: {response_json}')
-                    return response_dict.get('message_id')
-
-                if resp.status == 400:
-                    response_json = await resp.text()
-                    response_dict = json.loads(response_json)
-                    error_text = response_dict.get('reason')
-
-                    if error_text == "Error fetching parameter 'api_key': Missing or invalid field(s): 'api_key'":
-                        raise InvalidApiKey()
-
-                    raise ChatbaseException(error_text)
-
-                raise ChatbaseException('Unknown response')
+        result = await self._send()
+        return result.get('message_id')
