@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="aioChatbase",
-    version="0.0.1",
+    version="0.0.2",
     author="Oleg Abramov",
     author_email="1282524@gmail.com",
     description="Asyncio Chatbase API library",
