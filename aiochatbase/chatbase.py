@@ -14,9 +14,9 @@ class Chatbase:
         self.api_key = api_key
         self.platform = platform
 
-    async def register_inbox_message(self, user_id, intent=None, message=None, not_handled=None, version=None,
-                                     session_id=None, message_type=MessageTypes.USER,
-                                     time_stamp=datetime.now().timestamp()):
+    async def register_message(self, user_id, intent=None, message=None, not_handled=None, version=None,
+                               session_id=None, message_type=MessageTypes.USER,
+                               time_stamp=datetime.now().timestamp()):
         """
         :type user_id: str
         :type intent: str

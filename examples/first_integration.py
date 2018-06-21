@@ -2,20 +2,20 @@ import asyncio
 
 from aiochatbase import Chatbase
 
-API_KEY = 'fe395781-d485-43b4-a4c7-7f182c08298b1'
+API_KEY = 'paste-your-api-key-token-here'
 PLATFORM = 'Telegram'
 
 loop = asyncio.get_event_loop()
-cb = Chatbase(API_KEY, PLATFORM)
+cb = Chatbase(api_key=API_KEY, platform=PLATFORM)
 
 
 async def send_handled_message():
-    result = await cb.register_inbox_message(user_id='123456', intent='test message')
+    result = await cb.register_message(user_id='123456', intent='test message')
     print(f'Handled Chatbase message id: {result}')
 
 
 async def send_non_handled_message():
-    result = await cb.register_inbox_message(user_id='123456', intent='another test message', not_handled=True)
+    result = await cb.register_message(user_id='123456', intent='another test message', not_handled=True)
     print(f'non handled Chatbase message id: {result}')
 
 
