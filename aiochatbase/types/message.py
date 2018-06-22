@@ -67,6 +67,7 @@ class Message(BasicChatbaseObject):
         self.version = version
         self.session_id = session_id
 
+        # settings
         self._api_url = f"https://chatbase.com/api/message"
 
     def to_json(self):
@@ -78,12 +79,23 @@ class Message(BasicChatbaseObject):
             'user_id': self.user_id,
             'time_stamp': self.time_stamp,
             'platform': self.platform,
-            'message': self.message or '',
-            'intent': self.intent or '',
-            'not_handled': self.not_handled or False,
-            'version': self.version or '',
-            'session_id': self.session_id or ''
         }
+
+        if self.message:
+            data['message'] = self.message
+
+        if self.intent:
+            data['intent'] = self.intent
+
+        if self.not_handled:
+            data['not_handled'] = self.not_handled
+
+        if self.version:
+            data['version'] = self.version
+
+        if self.session_id:
+            data['session_id'] = self.session_id
+
         return json.dumps(data)
 
     async def check(self):
@@ -91,11 +103,19 @@ class Message(BasicChatbaseObject):
 
         # message_type only user and agent
         if self.message_type not in (MessageTypes.USER, MessageTypes.AGENT):
-            raise InvalidMessageTypeError('message_type: valid values "user" or "agent"')
+            raise InvalidMessageTypeError('message_type: valid values "user" or "agent".')
 
         # Only user-type Messages can have the not_handled attribute as True.
         if self.not_handled and self.message_type == MessageTypes.AGENT:
-            raise InvalidMessageTypeError('Cannot set not_handled as True when msg is of type Agent')
+            raise InvalidMessageTypeError('Cannot set not_handled as True when msg is of type Agent.')
+
+        # Only user-type Messages can be with defined intentions.
+        if self.intent and self.message_type == MessageTypes.AGENT:
+            raise InvalidMessageTypeError('Cannot set intent for agent messages.')
+
+        # Message length limit - 1200 characters
+        if self.message and len(self.message) > 1200:
+            self.message = self.message[:1200]
 
         return True
 

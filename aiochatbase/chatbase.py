@@ -1,6 +1,9 @@
 from datetime import datetime
+import logging
 
 from .types import Message, MessageTypes, Click, Event
+
+logger = logging.getLogger(f'chatbase')
 
 
 class Chatbase:
@@ -18,13 +21,28 @@ class Chatbase:
                                session_id=None, message_type=MessageTypes.USER,
                                time_stamp=datetime.now().timestamp()):
         """
+        :param user_id: chatbot user id
         :type user_id: str
+
+        :param intent: chatbot user intention
         :type intent: str
+
+        :param message: user full message
         :type message: str
+
+        :param not_handled: True if your bot don't understand user intention
         :type not_handled: bool
+
+        :param version: fill to track versions of your code
         :type version: str
+
+        :param session_id: fill to track your own custom sessions
         :type session_id: str
+
+        :param message_type: "user" or "agent" (aka your chatbot)
         :type message_type: str
+
+        :param time_stamp: milliseconds since the UNIX epoch, used to sequence messages.
         :type time_stamp: int
 
         :return: Chatbase message id
@@ -33,14 +51,17 @@ class Chatbase:
         message = Message(api_key=self.api_key,
                           message_type=message_type,
                           user_id=user_id,
-                          time_stamp=int(time_stamp),
+                          time_stamp=int(time_stamp * 1000),
                           platform=self.platform,
                           message=message,
                           intent=intent,
                           not_handled=not_handled,
                           version=version,
                           session_id=session_id)
-        return await message.send()
+        cb_msg_id = await message.send()
+        logger.debug(f"Registered {self.platform} message from {message_type} {user_id} with intent '{intent}'. "
+                     f"Message id: {cb_msg_id}. ")
+        return cb_msg_id
 
     async def register_click(self, url, user_id=None, version=None):
         """
@@ -52,15 +73,19 @@ class Chatbase:
         :rtype bool
         """
         click = Click(self.api_key, url, self.platform, user_id=user_id, version=version)
-        return await click.send()
+        result = await click.send()
+        logger.debug(f"Registered {self.platform} click from user {user_id} to url '{url}'. ")
+        return result
 
-    async def register_event(self, user_id, intent, timestamp=datetime.now().timestamp(), platform=None, version=None,
-                             properties=None):
+    async def register_event(self, user_id, intent, time_stamp=datetime.now().timestamp(), platform=None,
+                             version=None, properties=None):
         event = Event(api_key=self.api_key,
                       user_id=user_id,
                       intent=intent,
-                      timestamp_millis=int(timestamp * 1000),
+                      timestamp_millis=int(time_stamp * 1000),
                       platform=platform,
                       version=version,
                       properties=properties)
-        return await event.send()
+        result = await event.send()
+        logger.debug(f"Registered {self.platform} event from user {user_id} with intent {intent}. ")
+        return result

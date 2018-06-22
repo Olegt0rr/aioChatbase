@@ -10,7 +10,7 @@ cb = Chatbase(api_key=API_KEY, platform=PLATFORM)
 
 
 async def send_handled_message():
-    result = await cb.register_message(user_id='123456', intent='test message')
+    result = await cb.register_message(user_id='512345678', intent='test message 2')
     print(f'Handled Chatbase message id: {result}')
 
 
@@ -28,24 +28,21 @@ async def integration():
     print('=== Integration started ===')
     tasks = [
         send_handled_message(),
-        send_non_handled_message(),
-        send_url_click(),
+        # send_non_handled_message(),
+        # send_url_click(),
     ]
     done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_EXCEPTION)
 
-    if len(done) != len(tasks):
+    # get exception reason
+    for task in done:
+        if task.exception():
+            print(f'ERROR! {task.exception()}')
 
-        # get exception reason
-        for task in done:
-            if task.exception():
-                print(f'ERROR! {task.exception()}')
-
-        # cancel other tasks
-        for task in pending:
-            task.cancel()
-
-        print('=== Integration NOT completed ===')
-        return
+            # cancel other tasks
+            for t in pending:
+                t.cancel()
+            print('=== Integration NOT completed ===')
+            return
 
     print('=== Integration completed ===')
 
