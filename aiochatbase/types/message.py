@@ -56,7 +56,7 @@ class Message(BasicChatbaseObject):
         # required
         self.api_key = api_key
         self.message_type = message_type
-        self.user_id = user_id
+        self.user_id = str(user_id)
         self.time_stamp = time_stamp
         self.platform = platform
 
@@ -88,6 +88,10 @@ class Message(BasicChatbaseObject):
 
     async def check(self):
         from ..types import MessageTypes, InvalidMessageTypeError
+
+        # message_type only user and agent
+        if self.message_type not in (MessageTypes.USER, MessageTypes.AGENT):
+            raise InvalidMessageTypeError('message_type: valid values "user" or "agent"')
 
         # Only user-type Messages can have the not_handled attribute as True.
         if self.not_handled and self.message_type == MessageTypes.AGENT:

@@ -23,7 +23,7 @@ class Event(BasicChatbaseObject):
         """
         # required
         self.api_key = api_key
-        self.user_id = user_id
+        self.user_id = str(user_id)
         self.intent = intent
 
         # optional

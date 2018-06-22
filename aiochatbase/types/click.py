@@ -34,8 +34,8 @@ class Click(BasicChatbaseObject):
         self.platform = platform
 
         # optional
-        self.user_id = user_id
-        self.version = version
+        self.user_id = str(user_id) if user_id else None
+        self.version = str(version) if version else None
 
         self._api_url = f"https://chatbase.com/api/click"
 
