@@ -1,7 +1,9 @@
 import json
 import logging
+from typing import List
 
 from .basic import BasicChatbaseObject
+from ..types.errors import ChatbaseException
 
 logger = logging.getLogger(f'chatbase.{__name__}')
 
@@ -70,8 +72,8 @@ class Message(BasicChatbaseObject):
         # settings
         self._api_url = f"https://chatbase.com/api/message"
 
-    def to_json(self):
-        """ Return a JSON version for use with the Chatbase API """
+    def to_dict(self):
+        """ Return a dict version for use with the Chatbase API """
 
         data = {
             'api_key': self.api_key,
@@ -96,6 +98,11 @@ class Message(BasicChatbaseObject):
         if self.session_id:
             data['session_id'] = self.session_id
 
+        return data
+
+    def to_json(self):
+        """ Return a JSON version for use with the Chatbase API """
+        data = self.to_dict()
         return json.dumps(data)
 
     async def check(self):
@@ -123,3 +130,35 @@ class Message(BasicChatbaseObject):
         await self.check()
         result = await self._send()
         return result.get('message_id')
+
+
+class Messages(BasicChatbaseObject):
+    def __init__(self, message_list):
+        """
+        :param message_list:
+        :type message_list: List[Message]
+        """
+        self.messages = message_list
+        self._api_url = 'https://chatbase.com/api/messages'
+
+    def to_json(self):
+        """ Return a JSON version for use with the Chatbase API """
+
+        data = {
+            'messages': [m.to_dict() for m in self.messages]
+        }
+        return json.dumps(data)
+
+    async def send(self):
+        for m in self.messages:
+            await m.check()
+
+        result = await self._send()
+        responses = result.get('responses')
+
+        if not result.get('all_succeeded'):
+            for r in responses:
+                if r.get('status') == 400:
+                    raise ChatbaseException(r.get('reason'))
+
+        return [r.get('message_id') for r in responses]

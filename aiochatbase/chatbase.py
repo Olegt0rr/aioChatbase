@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 
-from .types import Message, MessageTypes, Click, Event
+from .types import Message, Messages, MessageTypes, Click, Event
 
 logger = logging.getLogger(f'chatbase')
 
@@ -17,6 +17,50 @@ class Chatbase:
         """
         self.api_key = api_key
         self.platform = platform
+
+    async def prepare_message(self, user_id, intent=None, message=None, not_handled=None, version=None,
+                              session_id=None, message_type=MessageTypes.USER,
+                              time_stamp=datetime.now().timestamp()):
+        """
+        Prepare message
+
+        :param user_id: chatbot user id
+        :type user_id: str
+
+        :param intent: chatbot user intention
+        :type intent: str
+
+        :param message: user full message
+        :type message: str
+
+        :param not_handled: True if your bot don't understand user intention
+        :type not_handled: bool
+
+        :param version: fill to track versions of your code
+        :type version: str
+
+        :param session_id: fill to track your own custom sessions
+        :type session_id: str
+
+        :param message_type: "user" or "agent" (aka your chatbot)
+        :type message_type: str
+
+        :param time_stamp: seconds since the UNIX epoch, used to sequence messages.
+        :type time_stamp: int
+
+        :return: Chatbase message
+        :rtype: Message
+        """
+        return Message(api_key=self.api_key,
+                       message_type=message_type,
+                       user_id=user_id,
+                       time_stamp=int(time_stamp * 1000),
+                       platform=self.platform,
+                       message=message,
+                       intent=intent,
+                       not_handled=not_handled,
+                       version=version,
+                       session_id=session_id)
 
     async def register_message(self, user_id, intent=None, message=None, not_handled=None, version=None,
                                session_id=None, message_type=MessageTypes.USER,
@@ -45,26 +89,32 @@ class Chatbase:
         :param message_type: "user" or "agent" (aka your chatbot)
         :type message_type: str
 
-        :param time_stamp: milliseconds since the UNIX epoch, used to sequence messages.
+        :param time_stamp: seconds since the UNIX epoch, used to sequence messages.
         :type time_stamp: int
 
         :return: Chatbase message id
         :rtype: str
         """
-        message = Message(api_key=self.api_key,
-                          message_type=message_type,
-                          user_id=user_id,
-                          time_stamp=int(time_stamp * 1000),
-                          platform=self.platform,
-                          message=message,
-                          intent=intent,
-                          not_handled=not_handled,
-                          version=version,
-                          session_id=session_id)
+        message = await self.prepare_message(user_id, intent=intent, message=message, not_handled=not_handled,
+                                             version=version, session_id=session_id, message_type=message_type,
+                                             time_stamp=time_stamp)
         cb_msg_id = await message.send()
         logger.debug(f"Registered {self.platform} message from {message_type} {user_id} with intent '{intent}'. "
                      f"Message id: {cb_msg_id}. ")
         return cb_msg_id
+
+    async def register_messages(self, message_list):
+        """
+        :param message_list:
+        :type message_list: List[Message]
+
+        :return: list of Chatbase message ids
+        :rtype: List[str]
+        """
+        messages = Messages(message_list)
+        msgs_id_list = await messages.send()
+        logger.debug(f"Registered {self.platform} messages: {msgs_id_list}")
+        return msgs_id_list
 
     async def register_click(self, url, user_id=None, version=None):
         """
