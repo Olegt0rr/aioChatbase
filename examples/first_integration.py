@@ -28,8 +28,8 @@ async def integration():
     print('=== Integration started ===')
     tasks = [
         send_handled_message(),
-        # send_non_handled_message(),
-        # send_url_click(),
+        send_non_handled_message(),
+        send_url_click(),
     ]
     done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_EXCEPTION)
 
