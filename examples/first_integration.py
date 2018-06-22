@@ -37,7 +37,8 @@ async def integration():
 
         # get exception reason
         for task in done:
-            print(f'ERROR! {task.exception()}')
+            if task.exception():
+                print(f'ERROR! {task.exception()}')
 
         # cancel other tasks
         for task in pending:
