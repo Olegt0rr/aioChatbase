@@ -68,7 +68,8 @@ class Chatbase:
                        intent=intent,
                        not_handled=not_handled,
                        version=version,
-                       session_id=session_id)
+                       session_id=session_id,
+                       session=self.session)
 
     async def register_message(self, user_id, intent=None, message=None, not_handled=None, version=None,
                                session_id=None, message_type=MessageTypes.USER,
@@ -139,7 +140,7 @@ class Chatbase:
         :return: list of Chatbase message ids
         :rtype: List[str]
         """
-        messages = Messages(message_list)
+        messages = Messages(message_list, session=self.session)
         msgs_id_list = await messages.send()
         logger.debug(f"Registered {self.platform} messages: {msgs_id_list}")
         return msgs_id_list
