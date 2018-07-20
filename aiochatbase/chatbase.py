@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import aiohttp
+import json
 from datetime import datetime
 
 from .types import Message, Messages, MessageTypes, Click, Event
@@ -9,7 +10,7 @@ logger = logging.getLogger(f'chatbase')
 
 
 class Chatbase:
-    def __init__(self, api_key, platform, task_mode=False):
+    def __init__(self, api_key, platform, task_mode=False, loop=None):
         """
         :param api_key: Chatbase API token key
         :type api_key: str
@@ -24,7 +25,13 @@ class Chatbase:
         self.api_key = api_key
         self.platform = platform
         self.task_mode = task_mode
-        self.session = aiohttp.ClientSession()
+
+        # asyncio loop instance
+        if loop is None:
+            loop = asyncio.get_event_loop()
+        self._loop = loop
+
+        self.session = aiohttp.ClientSession(loop=self._loop, json_serialize=json.dumps)
 
     async def prepare_message(self, user_id, intent=None, message=None, not_handled=None, version=None,
                               session_id=None, message_type=MessageTypes.USER,
