@@ -7,7 +7,7 @@ logger = logging.getLogger(f'chatbase.{__name__}')
 
 
 class Click(BasicChatbaseObject):
-    def __init__(self, api_key, url, platform, user_id=None, version=None):
+    def __init__(self, api_key, url, platform, user_id=None, version=None, session=None):
         """
 
         :param api_key: the Chatbase ID of the bot
@@ -28,6 +28,9 @@ class Click(BasicChatbaseObject):
         :type version: str
 
         """
+        # aiohttp
+        self.session = session
+
         # required
         self.api_key = api_key
         self.url = url
@@ -52,6 +55,6 @@ class Click(BasicChatbaseObject):
         return json.dumps(data)
 
     async def send(self):
-        result = await self._send()
+        result = await self._send(self.session)
         if result.get('status') == 200:
             return True

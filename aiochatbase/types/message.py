@@ -10,7 +10,7 @@ logger = logging.getLogger(f'chatbase.{__name__}')
 
 class Message(BasicChatbaseObject):
     def __init__(self, api_key, message_type, user_id, time_stamp, platform, message=None, intent=None,
-                 not_handled=None, version=None, session_id=None):
+                 not_handled=None, version=None, session_id=None, session=None):
         """
 
         :param api_key: the Chatbase ID of the bot
@@ -58,6 +58,9 @@ class Message(BasicChatbaseObject):
         # check input
         if not (isinstance(user_id, str) or isinstance(user_id, int)):
             raise InvalidUserIdType()
+
+        # aiohttp
+        self.session = session
 
         # required
         self.api_key = api_key
@@ -132,16 +135,19 @@ class Message(BasicChatbaseObject):
 
     async def send(self):
         await self.check()
-        result = await self._send()
+        result = await self._send(session=self.session)
         return result.get('message_id')
 
 
 class Messages(BasicChatbaseObject):
-    def __init__(self, message_list):
+    def __init__(self, message_list, session=None):
         """
         :param message_list:
         :type message_list: List[Message]
         """
+        # aiohttp
+        self.session = session
+
         self.messages = message_list
         self._api_url = 'https://chatbase.com/api/messages'
 
@@ -157,7 +163,7 @@ class Messages(BasicChatbaseObject):
         for m in self.messages:
             await m.check()
 
-        result = await self._send()
+        result = await self._send(session=self.session)
         responses = result.get('responses')
 
         if not result.get('all_succeeded'):

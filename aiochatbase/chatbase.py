@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import aiohttp
 from datetime import datetime
 
 from .types import Message, Messages, MessageTypes, Click, Event
@@ -23,6 +24,7 @@ class Chatbase:
         self.api_key = api_key
         self.platform = platform
         self.task_mode = task_mode
+        self.session = aiohttp.ClientSession()
 
     async def prepare_message(self, user_id, intent=None, message=None, not_handled=None, version=None,
                               session_id=None, message_type=MessageTypes.USER,
@@ -175,7 +177,7 @@ class Chatbase:
         return await coroutine
 
     async def _register_click(self, url, user_id=None, version=None):
-        click = Click(self.api_key, url, self.platform, user_id=user_id, version=version)
+        click = Click(self.api_key, url, self.platform, user_id=user_id, version=version, session=self.session)
         result = await click.send()
         logger.debug(f"Registered {self.platform} click from user {user_id} to url '{url}'. ")
         return result
@@ -221,13 +223,14 @@ class Chatbase:
 
     async def _register_event(self, user_id, intent, time_stamp=datetime.now().timestamp(),
                               version=None, properties=None):
-        event = Event(api_key=self.api_key,
-                      user_id=user_id,
-                      intent=intent,
-                      timestamp_millis=int(time_stamp * 1000),
-                      platform=self.platform,
-                      version=version,
-                      properties=properties)
+        event = Event(api_key=self.api_key, user_id=user_id, intent=intent,
+                      timestamp_millis=int(time_stamp * 1000), platform=self.platform, version=version,
+                      properties=properties, session=self.session)
         result = await event.send()
         logger.debug(f"Registered {self.platform} event from user {user_id} with intent {intent}. ")
         return result
+
+    async def close(self):
+        if self.session and isinstance(self.session, aiohttp.ClientSession) and not self.session.closed:
+            await self.session.close()
+        await asyncio.sleep(0.25)

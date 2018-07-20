@@ -9,7 +9,8 @@ logger = logging.getLogger(f'chatbase.{__name__}')
 
 
 class Event(BasicChatbaseObject):
-    def __init__(self, api_key, user_id, intent, timestamp_millis=None, platform=None, version=None, properties=None):
+    def __init__(self, api_key, user_id, intent, timestamp_millis=None, platform=None, version=None, properties=None,
+                 session=None):
         """
 
         :param api_key:
@@ -21,6 +22,9 @@ class Event(BasicChatbaseObject):
         :param properties: Event properties in dict format
         :type properties: dict
         """
+        # aiohttp
+        self.session = session
+
         # required
         self.api_key = api_key
         self.user_id = str(user_id)
@@ -58,6 +62,6 @@ class Event(BasicChatbaseObject):
         return json.dumps(data)
 
     async def send(self):
-        result = await self._send()
+        result = await self._send(session=self.session)
         if result.get('creation_time'):
             return True
