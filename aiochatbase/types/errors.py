@@ -18,3 +18,8 @@ class ReceivedNoMessage(ChatbaseException):
 class InvalidApiKey(ChatbaseException):
     def __init__(self):
         super().__init__('Your API key is invalid.')
+
+
+class InvalidUserIdType(ChatbaseException):
+    def __init__(self):
+        super().__init__('User id must be string or integer.')

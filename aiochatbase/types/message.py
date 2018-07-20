@@ -3,7 +3,7 @@ import logging
 from typing import List
 
 from .basic import BasicChatbaseObject
-from ..types.errors import ChatbaseException
+from ..types.errors import ChatbaseException, InvalidUserIdType
 
 logger = logging.getLogger(f'chatbase.{__name__}')
 
@@ -21,7 +21,7 @@ class Message(BasicChatbaseObject):
         :type message_type: str
 
         :param user_id: the ID of the end-user
-        :type user_id: str
+        :type user_id: str or int
 
         :param time_stamp: milliseconds since the UNIX epoch, used to sequence messages.
                             (must be within previous 30 days)
@@ -55,10 +55,14 @@ class Message(BasicChatbaseObject):
                             report and daily session metrics
         :type session_id: str
         """
+        # check input
+        if not (isinstance(user_id, str) or isinstance(user_id, int)):
+            raise InvalidUserIdType()
+
         # required
         self.api_key = api_key
-        self.message_type = message_type
         self.user_id = str(user_id)
+        self.message_type = message_type
         self.time_stamp = time_stamp
         self.platform = platform
 
@@ -66,8 +70,8 @@ class Message(BasicChatbaseObject):
         self.message = message
         self.intent = intent
         self.not_handled = not_handled
-        self.version = version
-        self.session_id = session_id
+        self.version = str(version)
+        self.session_id = str(session_id)
 
         # settings
         self._api_url = f"https://chatbase.com/api/message"
