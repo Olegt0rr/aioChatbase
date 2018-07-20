@@ -48,4 +48,5 @@ async def integration():
 
 
 loop.run_until_complete(integration())
+loop.run_until_complete(cb.close())
 loop.close()

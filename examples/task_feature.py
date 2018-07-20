@@ -22,4 +22,5 @@ async def background_send_handled_message():
 
 
 loop.run_until_complete(background_send_handled_message())
+loop.run_until_complete(cb.close())
 loop.close()

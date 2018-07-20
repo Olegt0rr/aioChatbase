@@ -38,4 +38,9 @@ await cb.register_message(user_id='123456', intent='unknown message', not_handle
 await cb.register_click(url='google.com')
 ```
 
+6) Close instance
+```python
+await cb.close()
+```
+
  Check more examples at /examples folder

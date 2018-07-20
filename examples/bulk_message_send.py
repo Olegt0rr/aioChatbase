@@ -21,4 +21,5 @@ async def send_messages():
 
 
 loop.run_until_complete(send_messages())
+loop.run_until_complete(cb.close())
 loop.close()
