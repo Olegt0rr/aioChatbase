@@ -6,7 +6,7 @@ API_KEY = 'paste-your-api-key-token-here'
 PLATFORM = 'Telegram'
 
 loop = asyncio.get_event_loop()
-cb = Chatbase(api_key=API_KEY, platform=PLATFORM)
+cb = Chatbase(api_key=API_KEY, platform=PLATFORM, loop=loop)
 
 
 async def send_handled_message():
