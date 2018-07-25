@@ -1,8 +1,6 @@
 import json
 import logging
 
-import aiohttp
-
 from ..types.errors import InvalidApiKey, ChatbaseException
 
 logger = logging.getLogger(f'chatbase.{__name__}')

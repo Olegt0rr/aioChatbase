@@ -138,8 +138,8 @@ class Chatbase:
                                              version=version, session_id=session_id, message_type=message_type,
                                              time_stamp=time_stamp)
         cb_msg_id = await message.send()
-        logger.debug(f"Registered {self.platform} message from {message_type} {user_id} with intent '{intent}'. "
-                     f"Message id: {cb_msg_id}. Timestamp: {message.time_stamp} ")
+        logger.info(f"Registered {self.platform} message from {message_type} {user_id} with intent '{intent}'. "
+                    f"Message id: {cb_msg_id}. Timestamp: {message.time_stamp} ")
         return cb_msg_id
 
     async def register_messages(self, message_list):
@@ -152,7 +152,7 @@ class Chatbase:
         """
         messages = Messages(message_list, session=self.session)
         msgs_id_list = await messages.send()
-        logger.debug(f"Registered {self.platform} messages: {msgs_id_list}")
+        logger.info(f"Registered {self.platform} messages: {msgs_id_list}")
         return msgs_id_list
 
     async def register_click(self, url, user_id=None, version=None, task=None):
@@ -190,7 +190,7 @@ class Chatbase:
     async def _register_click(self, url, user_id=None, version=None):
         click = Click(self.api_key, url, self.platform, user_id=user_id, version=version, session=self.session)
         result = await click.send()
-        logger.debug(f"Registered {self.platform} click from user {user_id} to url '{url}'. ")
+        logger.info(f"Registered {self.platform} click from user {user_id} to url '{url}'. ")
         return result
 
     async def register_event(self, user_id, intent, time_stamp=None, version=None,
@@ -242,7 +242,7 @@ class Chatbase:
                       timestamp_millis=timestamp_millis, platform=self.platform, version=version,
                       properties=properties, session=self.session)
         result = await event.send()
-        logger.debug(f"Registered {self.platform} event from user {user_id} with intent {intent}. ")
+        logger.info(f"Registered {self.platform} event from user {user_id} with intent {intent}. ")
         return result
 
     async def close(self):
