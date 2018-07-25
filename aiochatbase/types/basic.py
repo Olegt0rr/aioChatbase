@@ -1,4 +1,4 @@
-import json
+from ..utils import json
 import logging
 
 from ..types.errors import InvalidApiKey, ChatbaseException

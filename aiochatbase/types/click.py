@@ -1,6 +1,6 @@
-import json
 import logging
 
+from ..utils import json
 from .basic import BasicChatbaseObject
 
 logger = logging.getLogger(f'chatbase.{__name__}')

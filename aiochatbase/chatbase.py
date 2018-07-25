@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import aiohttp
-import json
+from .utils import json
 from datetime import datetime
 
 from .types import Message, Messages, MessageTypes, Click, Event

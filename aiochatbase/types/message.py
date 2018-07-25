@@ -1,8 +1,8 @@
-import json
 import logging
 from typing import List
 
 from .basic import BasicChatbaseObject
+from ..utils import json
 from ..types.errors import ChatbaseException, InvalidUserIdType
 
 logger = logging.getLogger(f'chatbase.{__name__}')
