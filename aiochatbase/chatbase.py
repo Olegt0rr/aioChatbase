@@ -35,7 +35,7 @@ class Chatbase:
 
     async def prepare_message(self, user_id, intent=None, message=None, not_handled=None, version=None,
                               session_id=None, message_type=MessageTypes.USER,
-                              time_stamp=datetime.now().timestamp()):
+                              time_stamp=None):
         """
         Prepare message
 
@@ -61,15 +61,18 @@ class Chatbase:
         :type message_type: str
 
         :param time_stamp: seconds since the UNIX epoch, used to sequence messages.
-        :type time_stamp: float
+        :type time_stamp: int or float
 
         :return: Chatbase message
         :rtype: Message
         """
+        if not time_stamp:
+            time_stamp = datetime.now().timestamp()
+
         return Message(api_key=self.api_key,
                        message_type=message_type,
                        user_id=user_id,
-                       time_stamp=int(time_stamp * 1000),
+                       time_stamp=int(time_stamp * 1000),  # convert to microseconds
                        platform=self.platform,
                        message=message,
                        intent=intent,
@@ -80,7 +83,7 @@ class Chatbase:
 
     async def register_message(self, user_id, intent=None, message=None, not_handled=None, version=None,
                                session_id=None, message_type=MessageTypes.USER,
-                               time_stamp=datetime.now().timestamp(), task=None):
+                               time_stamp=None, task=None):
         """
          Register message
 
@@ -106,7 +109,7 @@ class Chatbase:
          :type message_type: str
 
          :param time_stamp: seconds since the UNIX epoch, used to sequence messages.
-         :type time_stamp: int
+         :type time_stamp: int or float
 
          :param task: Returns aio.Task if True, returns result if False, default value if None
          :type task: bool
@@ -130,13 +133,13 @@ class Chatbase:
 
     async def _register_message(self, user_id, intent=None, message=None, not_handled=None, version=None,
                                 session_id=None, message_type=MessageTypes.USER,
-                                time_stamp=datetime.now().timestamp()):
+                                time_stamp=None):
         message = await self.prepare_message(user_id, intent=intent, message=message, not_handled=not_handled,
                                              version=version, session_id=session_id, message_type=message_type,
                                              time_stamp=time_stamp)
         cb_msg_id = await message.send()
         logger.debug(f"Registered {self.platform} message from {message_type} {user_id} with intent '{intent}'. "
-                     f"Message id: {cb_msg_id}. ")
+                     f"Message id: {cb_msg_id}. Timestamp: {message.time_stamp} ")
         return cb_msg_id
 
     async def register_messages(self, message_list):
@@ -190,7 +193,7 @@ class Chatbase:
         logger.debug(f"Registered {self.platform} click from user {user_id} to url '{url}'. ")
         return result
 
-    async def register_event(self, user_id, intent, time_stamp=datetime.now().timestamp(), version=None,
+    async def register_event(self, user_id, intent, time_stamp=None, version=None,
                              properties=None, task=None):
         """
         Register event
@@ -202,7 +205,8 @@ class Chatbase:
         :type intent: str
 
         :param time_stamp: seconds since the UNIX epoch, used to sequence messages.
-        :type time_stamp: float
+                            If None - automatic timestamp.
+        :type time_stamp: float or int
 
         :param version: fill to track versions of your code
         :type version: str
@@ -229,10 +233,13 @@ class Chatbase:
 
         return await coroutine
 
-    async def _register_event(self, user_id, intent, time_stamp=datetime.now().timestamp(),
-                              version=None, properties=None):
+    async def _register_event(self, user_id, intent, time_stamp=None, version=None, properties=None):
+        if not time_stamp:
+            time_stamp = datetime.now().timestamp()
+
+        timestamp_millis = int(time_stamp * 1000)
         event = Event(api_key=self.api_key, user_id=user_id, intent=intent,
-                      timestamp_millis=int(time_stamp * 1000), platform=self.platform, version=version,
+                      timestamp_millis=timestamp_millis, platform=self.platform, version=version,
                       properties=properties, session=self.session)
         result = await event.send()
         logger.debug(f"Registered {self.platform} event from user {user_id} with intent {intent}. ")
