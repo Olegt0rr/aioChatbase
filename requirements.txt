@@ -1,2 +1,2 @@
-aiohttp
-certifi>=2018.01.18
+aiohttp>=3.3.2
+certifi>=2018.4.16
