@@ -1,6 +1,8 @@
 import asyncio
 import logging
 import aiohttp
+import ssl
+import certifi
 from .utils import json
 from datetime import datetime
 
@@ -31,7 +33,9 @@ class Chatbase:
             loop = asyncio.get_event_loop()
         self._loop = loop
 
-        self.session = aiohttp.ClientSession(loop=self._loop, json_serialize=json.dumps)
+        ssl_context = ssl.create_default_context(cafile=certifi.where())
+        connector = aiohttp.TCPConnector(ssl_context=ssl_context, loop=self._loop)
+        self.session = aiohttp.ClientSession(connector=connector, loop=self._loop, json_serialize=json.dumps)
 
     async def prepare_message(self, user_id, intent=None, message=None, not_handled=None, version=None,
                               session_id=None, message_type=MessageTypes.USER,

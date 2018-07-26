@@ -1,1 +1,2 @@
 aiohttp
+certifi>=2018.01.18
