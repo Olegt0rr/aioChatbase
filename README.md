@@ -38,7 +38,7 @@ await cb.register_message(user_id='123456', intent='unknown message', not_handle
 await cb.register_click(url='google.com')
 ```
 
-6) Close instance
+6) Close instance on your app shutdown
 ```python
 await cb.close()
 ```
