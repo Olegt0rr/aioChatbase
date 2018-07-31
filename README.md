@@ -44,7 +44,7 @@ await cb.register_click(url='google.com')
 await cb.close()
 ```
 
- Check more examples at /examples folder
+ Check more examples at the [/examples](https://github.com/Olegt0rr/aioChatbase/tree/master/examples) folder
  
  Feel free to read our [Wiki](https://github.com/Olegt0rr/aioChatbase/wiki)
 
