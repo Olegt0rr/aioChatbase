@@ -87,7 +87,7 @@ class Chatbase:
         return Message(api_key=self.api_key,
                        message_type=message_type,
                        user_id=user_id,
-                       time_stamp=int(time_stamp * 1000),  # convert to microseconds
+                       time_stamp=int(time_stamp * 1000),  # milliseconds!
                        platform=self.platform,
                        message=message,
                        intent=intent,
@@ -97,8 +97,7 @@ class Chatbase:
                        session=self.session)
 
     async def register_message(self, user_id, intent=None, message=None, not_handled=None, version=None,
-                               session_id=None, message_type=MessageTypes.USER,
-                               time_stamp=None, task=None):
+                               session_id=None, message_type=MessageTypes.USER, time_stamp=None, task=None):
         """
          Register message
 
@@ -147,8 +146,7 @@ class Chatbase:
         return await coroutine
 
     async def _register_message(self, user_id, intent=None, message=None, not_handled=None, version=None,
-                                session_id=None, message_type=MessageTypes.USER,
-                                time_stamp=None):
+                                session_id=None, message_type=MessageTypes.USER, time_stamp=None):
         message = await self.prepare_message(user_id, intent=intent, message=message, not_handled=not_handled,
                                              version=version, session_id=session_id, message_type=message_type,
                                              time_stamp=time_stamp)
@@ -236,8 +234,7 @@ class Chatbase:
         logger.info(f"Registered {self.platform} click from user {user_id} to url '{url}'. ")
         return result
 
-    async def register_event(self, user_id, intent, time_stamp=None, version=None,
-                             properties=None, task=None):
+    async def register_event(self, user_id, intent, time_stamp=None, version=None, properties=None, task=None):
         """
         Register event
 
@@ -281,9 +278,8 @@ class Chatbase:
             time_stamp = datetime.now().timestamp()
 
         timestamp_millis = int(time_stamp * 1000)
-        event = Event(api_key=self.api_key, user_id=user_id, intent=intent,
-                      timestamp_millis=timestamp_millis, platform=self.platform, version=version,
-                      properties=properties, session=self.session)
+        event = Event(api_key=self.api_key, user_id=user_id, intent=intent, timestamp_millis=timestamp_millis,
+                      platform=self.platform, version=version, properties=properties, session=self.session)
         result = await event.send()
         logger.info(f"Registered {self.platform} event from user {user_id} with intent {intent}. ")
         return result
