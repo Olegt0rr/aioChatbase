@@ -6,13 +6,13 @@ import certifi
 from .utils import json
 from datetime import datetime
 
-from .types import Message, Messages, MessageTypes, Click, Event
+from .types import Message, Messages, MessageTypes, Click, Event, Pool
 
 logger = logging.getLogger(f'chatbase')
 
 
 class Chatbase:
-    def __init__(self, api_key, platform, task_mode=False, loop=None):
+    def __init__(self, api_key, platform, task_mode=False, pool_size=0, loop=None):
         """
         :param api_key: Chatbase API token key
         :type api_key: str
@@ -22,11 +22,22 @@ class Chatbase:
 
         :param task_mode: returns asyncio.Task in register_* methods
         :type task_mode: bool
+
+        :param pool_size: you can save messages to pool for high-load chatbots
+        :type pool_size: int
+
+        :param loop: your asyncio loop
+
         """
 
         self.api_key = api_key
         self.platform = platform
         self.task_mode = task_mode
+        self.pool_size = pool_size
+
+        # pool init
+        if bool(self.pool_size):
+            self.pool = Pool(self, size=pool_size)
 
         # asyncio loop instance
         if loop is None:
@@ -141,12 +152,40 @@ class Chatbase:
         message = await self.prepare_message(user_id, intent=intent, message=message, not_handled=not_handled,
                                              version=version, session_id=session_id, message_type=message_type,
                                              time_stamp=time_stamp)
+
+        if bool(self.pool_size):
+            await self.pool.add_message(message)
+            return
+
         cb_msg_id = await message.send()
         logger.info(f"Registered {self.platform} message from {message_type} {user_id} with intent '{intent}'. "
                     f"Message id: {cb_msg_id}. Timestamp: {message.time_stamp} ")
         return cb_msg_id
 
-    async def register_messages(self, message_list):
+    async def register_messages(self, message_list, task=None):
+        """
+        :param message_list:
+        :type message_list: List[Message]
+
+        :param task: task mode (run in asyncio task)
+        :type task: bool
+
+        :return: list of Chatbase message ids
+        :rtype: List[str]
+        """
+        coroutine = self._register_messages(message_list=message_list)
+
+        if isinstance(task, bool):
+            if not task:
+                return await coroutine
+            return asyncio.ensure_future(coroutine)
+
+        if self.task_mode:
+            return asyncio.ensure_future(coroutine)
+
+        return await coroutine
+
+    async def _register_messages(self, message_list):
         """
         :param message_list:
         :type message_list: List[Message]
@@ -250,6 +289,13 @@ class Chatbase:
         return result
 
     async def close(self):
+        # send last messages from pool
+        if bool(self.pool_size):
+            await self.pool.close()
+
+        # close session
         if self.session and isinstance(self.session, aiohttp.ClientSession) and not self.session.closed:
             await self.session.close()
+
+        # graceful shutdown for aiohttp
         await asyncio.sleep(0.25)
