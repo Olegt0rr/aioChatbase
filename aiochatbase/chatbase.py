@@ -12,7 +12,7 @@ logger = logging.getLogger(f'chatbase')
 
 
 class Chatbase:
-    def __init__(self, api_key, platform, task_mode=False, pool_size=0, loop=None):
+    def __init__(self, api_key, platform, task_mode=False, pool_size=0, loop=None, version=None):
         """
         :param api_key: Chatbase API token key
         :type api_key: str
@@ -28,12 +28,16 @@ class Chatbase:
 
         :param loop: your asyncio loop
 
+        :param version: version of your product
+        :type version: str
+
         """
 
         self.api_key = api_key
         self.platform = platform
         self.task_mode = task_mode
         self.pool_size = pool_size
+        self.version = version
 
         # pool init
         if bool(self.pool_size):
@@ -83,6 +87,9 @@ class Chatbase:
         """
         if not time_stamp:
             time_stamp = datetime.now().timestamp()
+
+        if not version:
+            version = self.version
 
         return Message(api_key=self.api_key,
                        message_type=message_type,
