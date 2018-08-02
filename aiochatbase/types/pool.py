@@ -36,5 +36,5 @@ class Pool:
         if not self.task.cancelled():
             self.task.cancel()
 
-        if self.messages:
+        if self.messages:  # pragma: no cover
             await self.send_messages()

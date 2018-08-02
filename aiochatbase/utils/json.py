@@ -8,13 +8,13 @@ import json
 try:
     import ujson
 
-except ImportError:
+except ImportError:  # pragma: no cover
     ujson = None
 
 _use_ujson = True if ujson else False
 
 
-def disable_ujson():
+def disable_ujson():  # pragma: no cover
     global _use_ujson
     _use_ujson = False
 

@@ -10,7 +10,7 @@ class BasicChatbaseObject:
     _api_url = ''
     _content_type = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 
-    def to_json(self):
+    def to_json(self):  # pragma: no cover
         return ''
 
     async def _send(self, session):
