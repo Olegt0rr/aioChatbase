@@ -113,7 +113,7 @@ class Message(BasicChatbaseObject):
         return json.dumps(data)
 
     async def check(self):
-        from ..types import MessageTypes, InvalidMessageTypeError
+        from ..types import MessageTypes, InvalidMessageTypeError, NotHandledAgentMessage, IntentInAgentMessage
 
         # message_type only user and agent
         if self.message_type not in (MessageTypes.USER, MessageTypes.AGENT):
@@ -121,11 +121,11 @@ class Message(BasicChatbaseObject):
 
         # Only user-type Messages can have the not_handled attribute as True.
         if self.not_handled and self.message_type == MessageTypes.AGENT:
-            raise InvalidMessageTypeError('Cannot set not_handled as True when msg is of type Agent.')
+            raise NotHandledAgentMessage('Cannot set not_handled as True when msg is of type Agent.')
 
         # Only user-type Messages can be with defined intentions.
         if self.intent and self.message_type == MessageTypes.AGENT:
-            raise InvalidMessageTypeError('Cannot set intent for agent messages.')
+            raise IntentInAgentMessage('Cannot set intent for agent messages.')
 
         # Message length limit - 1200 characters
         if self.message and len(self.message) > 1200:
@@ -168,7 +168,12 @@ class Messages(BasicChatbaseObject):
 
         if not result.get('all_succeeded'):
             for r in responses:
-                if r.get('status') == 400:
+                if r.get('status') == 'failure':
                     raise ChatbaseException(r.get('reason'))
 
         return [r.get('message_id') for r in responses]
+
+
+class MessageTypes:
+    USER = 'user'
+    AGENT = 'agent'

@@ -11,6 +11,23 @@ class InvalidMessageTypeError(ChatbaseException):
     pass
 
 
+class NotHandledAgentMessage(ChatbaseException):
+    """
+    Error raised when attribute not handled is True with agent message.
+    Agent messages can't be not handled
+
+    """
+    pass
+
+
+class IntentInAgentMessage(ChatbaseException):
+    """
+    Error raised when attribute intent set for agent message
+
+    """
+    pass
+
+
 class ReceivedNoMessage(ChatbaseException):
     pass
 

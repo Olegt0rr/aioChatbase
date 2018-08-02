@@ -2,13 +2,15 @@ import aresponses
 
 
 class FakeChatbaseServer(aresponses.ResponsesMockServer):
-    def __init__(self, message_dict, **kwargs):
+    def __init__(self, message_dict, status=200, reason='OK', **kwargs):
         super().__init__(**kwargs)
+        self._status = status
+        self._reason = reason
         self._body, self._headers = self.parse_data(message_dict)
 
     async def __aenter__(self):
         await super().__aenter__()
-        _response = self.Response(text=self._body, headers=self._headers, status=200, reason='OK')
+        _response = self.Response(text=self._body, headers=self._headers, status=self._status, reason=self._reason)
         self.add(self.ANY, response=_response)
 
     @staticmethod
@@ -35,6 +37,17 @@ BULK_RESPONSE_DICT = {
     ],
     "status": 200
 }
+
+BULK_BAD_RESPONSE_DICT = {
+    "all_succeeded": False,
+    "responses": [
+        {"message_id": 5917431215, "status": "success"},
+        {"status": "failure", 'reason': "something went wrong"},
+        {"message_id": 5917431217, "status": "success"}
+    ],
+    "status": 400
+}
+
 CLICK_RESPONSE_DICT = {"status": 200}
 
 

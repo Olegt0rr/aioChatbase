@@ -13,6 +13,7 @@ pytestmark = pytest.mark.asyncio
 CHATBASE_TOKEN = '123456789:AABBCCDDEEFFaabbccddeeff-1234567890'
 CHATBOT_PLATFORM = 'TestPlatform'
 USER_ID = '123456'
+MESSAGE_TEXT = 'test message text'
 INTENT = 'Another message'
 CB_MESSAGE_ID = '12345'
 
@@ -30,10 +31,11 @@ async def test_cb_init_without_loop(event_loop):
 
 
 async def test_prepare_message(cb, event_loop):
-    msg = await cb.prepare_message(user_id=USER_ID, intent=INTENT)
+    msg = await cb.prepare_message(user_id=USER_ID, intent=INTENT, message=MESSAGE_TEXT)
     assert isinstance(msg, types.Message)
     assert msg.user_id == USER_ID
     assert msg.intent == INTENT
+    assert msg.message == MESSAGE_TEXT
 
 
 async def test_register_message(cb, event_loop):
@@ -62,9 +64,9 @@ async def test_register_message_with_task(cb, event_loop):
 
 
 async def test_register_messages(cb, event_loop):
-    msg_1 = await cb.prepare_message('1', 'test bulk')
-    msg_2 = await cb.prepare_message('2', 'test bulk')
-    msg_3 = await cb.prepare_message('3', 'test bulk')
+    msg_1 = await cb.prepare_message('1', 'test bulk', message=MESSAGE_TEXT)
+    msg_2 = await cb.prepare_message('2', 'test bulk', not_handled=True)
+    msg_3 = await cb.prepare_message('3', 'test bulk', version='Test', session_id='12345')
     messages_list = [msg_1, msg_2, msg_3]
 
     async with FakeChatbaseServer(message_dict=BULK_RESPONSE_DICT, loop=event_loop):
@@ -123,7 +125,7 @@ async def test_register_event(cb, event_loop):
         'property 4 (bool)': True,
     }
     async with FakeChatbaseServer(message_dict=EVENT_RESPONSE_DICT, loop=event_loop):
-        result = await cb.register_event('123456', 'test event', properties=any_dict)
+        result = await cb.register_event('123456', 'test event', properties=any_dict, version='TestVersion')
     assert result is True
 
 

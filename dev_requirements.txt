@@ -2,3 +2,4 @@
 
 aresponses
 pytest
+ujson
