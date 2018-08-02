@@ -33,7 +33,7 @@ class Event(BasicChatbaseObject):
         # optional
         self.timestamp_millis = timestamp_millis
         self.platform = platform
-        self.version = version
+        self.version = str(version) if version else None
         self.properties: List[Property] = [Property(k, v) for k, v in properties.items()]
 
         self._api_url = f"https://api.chatbase.com/apis/v1/events/insert"

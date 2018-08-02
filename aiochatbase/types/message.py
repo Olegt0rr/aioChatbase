@@ -73,8 +73,8 @@ class Message(BasicChatbaseObject):
         self.message = message
         self.intent = intent
         self.not_handled = not_handled
-        self.version = version
-        self.session_id = session_id
+        self.version = str(version) if version else None
+        self.session_id = str(session_id) if session_id else None
 
         # settings
         self._api_url = f"https://chatbase.com/api/message"
