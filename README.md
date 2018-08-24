@@ -1,6 +1,6 @@
 ![Chatbase](https://image.ibb.co/ikDbFe/cb.png)
 
-[![Supported python versions](https://img.shields.io/pypi/pyversions/aiogram.svg?style=flat-square)](https://pypi.python.org/pypi/aiogram)
+[![Supported python versions](https://img.shields.io/pypi/pyversions/aioChatbase.svg?style=flat-square)](https://pypi.python.org/pypi/aioChatbase)
 [![MIT License](https://img.shields.io/pypi/l/aiogram.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![PyPi Package Version](https://img.shields.io/pypi/v/aioChatbase.svg?style=flat-square)](https://pypi.python.org/pypi/aioChatbase)
 [![PyPi status](https://img.shields.io/pypi/status/aioChatbase.svg?style=flat-square)](https://pypi.python.org/pypi/aioChatbase)
