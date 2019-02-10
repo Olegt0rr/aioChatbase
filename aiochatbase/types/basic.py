@@ -2,7 +2,6 @@ from ..utils import json
 import logging
 
 from ..types.errors import InvalidApiKey, ChatbaseException
-
 logger = logging.getLogger(f'chatbase.{__name__}')
 
 
@@ -19,7 +18,7 @@ class BasicChatbaseObject:
         """
 
         async with session.post(self._api_url, data=self.to_json(), headers=self._content_type) as resp:
-            response_json = await resp()
+            response_json = await resp.text()
             response_dict = json.loads(response_json)
 
             if resp.status == 200:
